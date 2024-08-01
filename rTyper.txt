@@ -1,0 +1,363 @@
+#include <iostream>
+#include <vector>
+#include <list>
+#include <map>
+#include <set>
+#include <algorithm>
+#include <memory>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+#include <functional>
+#include <string>
+#include <type_traits>
+#include <utility>
+
+class CShape
+{
+public:
+    virtual void Draw() const = 0;
+    virtual ~CShape() = default;
+};
+
+class CCircle : public CShape
+{
+public:
+    CCircle(double dRadius) : m_dRadius(dRadius) {}
+    void Draw() const override
+    {
+        std::cout << "Drawing Circle with radius: " << m_dRadius << std::endl;
+    }
+
+private:
+    double m_dRadius;
+};
+
+class CSquare : public CShape
+{
+public:
+    CSquare(double dSide) : m_dSide(dSide) {}
+    void Draw() const override
+    {
+        std::cout << "Drawing Square with side: " << m_dSide << std::endl;
+    }
+
+private:
+    double m_dSide;
+};
+
+template <typename T>
+class CContainer
+{
+public:
+    void Add(const T& item)
+    {
+        m_vItems.push_back(item);
+    }
+
+    void Display() const
+    {
+        for (const auto& item : m_vItems)
+        {
+            item.Draw();
+        }
+    }
+
+    typename std::vector<T>::const_iterator Find(const T& item) const
+    {
+        return std::find(m_vItems.begin(), m_vItems.end(), item);
+    }
+
+private:
+    std::vector<T> m_vItems;
+};
+
+void UseSmartPointers()
+{
+    std::unique_ptr<CShape> pCircle = std::make_unique<CCircle>(5.0);
+    std::unique_ptr<CShape> pSquare = std::make_unique<CSquare>(4.0);
+
+    pCircle->Draw();
+    pSquare->Draw();
+}
+
+std::mutex g_mtx;
+std::condition_variable g_cv;
+bool g_bReady = false;
+
+void PrintNumbers(int iId)
+{
+    std::unique_lock<std::mutex> lock(g_mtx);
+    g_cv.wait(lock, [] { return g_bReady; });
+    std::cout << "Thread " << iId << " is running\n";
+}
+
+void UseThreads()
+{
+    std::thread t1(PrintNumbers, 1);
+    std::thread t2(PrintNumbers, 2);
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    {
+        std::lock_guard<std::mutex> lock(g_mtx);
+        g_bReady = true;
+    }
+    g_cv.notify_all();
+
+    t1.join();
+    t2.join();
+}
+
+void UseSTL()
+{
+    std::map<std::string, int> mAgeMap;
+    mAgeMap["Alice"] = 30;
+    mAgeMap["Bob"] = 25;
+
+    for (const auto& pair : mAgeMap)
+    {
+        std::cout << pair.first << " is " << pair.second << " years old.\n";
+    }
+
+    std::set<int> sUniqueNumbers = {1, 2, 2, 3, 4, 5, 5};
+    for (const auto& num : sUniqueNumbers)
+    {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+}
+
+void UseLambdas()
+{
+    int iFactor = 2;
+    std::vector<int> vNumbers = {1, 2, 3, 4, 5};
+
+    std::for_each(vNumbers.begin(), vNumbers.end(), [iFactor](int& num)
+    {
+        num *= iFactor;
+    });
+
+    for (const auto& num : vNumbers)
+    {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+}
+
+class CAdder
+{
+public:
+    CAdder(int iValue) : m_iValue(iValue) {}
+    int operator()(int iX) const
+    {
+        return iX + m_iValue;
+    }
+
+private:
+    int m_iValue;
+};
+
+template <typename T>
+class CMultiplier
+{
+public:
+    CMultiplier(T tFactor) : m_tFactor(tFactor) {}
+    T operator()(const T& tX) const
+    {
+        return tX * m_tFactor;
+    }
+
+private:
+    T m_tFactor;
+};
+
+void UseFunctors()
+{
+    std::vector<int> vNumbers = {1, 2, 3, 4, 5};
+    CAdder adder(10);
+    CMultiplier<int> multiplier(3);
+
+    for (int& num : vNumbers)
+    {
+        num = adder(num);
+    }
+
+    for (const int num : vNumbers)
+    {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    std::transform(vNumbers.begin(), vNumbers.end(), vNumbers.begin(), multiplier);
+
+    for (const int num : vNumbers)
+    {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+}
+
+template <typename T>
+class CAdvancedContainer
+{
+public:
+    void Add(const T& item)
+    {
+        m_vItems.push_back(item);
+    }
+
+    void Display() const
+    {
+        for (const auto& item : m_vItems)
+        {
+            std::cout << item << " ";
+        }
+        std::cout << std::endl;
+    }
+
+private:
+    std::vector<T> m_vItems;
+};
+
+template <>
+class CAdvancedContainer<std::string>
+{
+public:
+    void Add(const std::string& item)
+    {
+        m_vItems.push_back(item);
+    }
+
+    void Display() const
+    {
+        for (const auto& item : m_vItems)
+        {
+            std::cout << "[" << item << "] ";
+        }
+        std::cout << std::endl;
+    }
+
+private:
+    std::vector<std::string> m_vItems;
+};
+
+template <typename T>
+class CMyAllocator
+{
+public:
+    using value_type = T;
+
+    T* Allocate(std::size_t n)
+    {
+        std::cout << "Allocating " << n << " elements.\n";
+        return static_cast<T*>(::operator new(n * sizeof(T)));
+    }
+
+    void Deallocate(T* p, std::size_t)
+    {
+        std::cout << "Deallocating memory.\n";
+        ::operator delete(p);
+    }
+};
+
+void UseCustomAllocator()
+{
+    std::vector<int, CMyAllocator<int>> vVec;
+    vVec.push_back(1);
+    vVec.push_back(2);
+    vVec.push_back(3);
+
+    for (const auto& num : vVec)
+    {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+}
+
+void UseFutures()
+{
+    std::promise<int> prom;
+    std::future<int> fut = prom.get_future();
+
+    std::thread producer([&prom]
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        prom.set_value(10);
+    });
+
+    std::thread consumer([&fut]
+    {
+        int iValue = fut.get();
+        std::cout << "Received value: " << iValue << std::endl;
+    });
+
+    producer.join();
+    consumer.join();
+}
+
+template <typename T>
+void PrintType()
+{
+    if constexpr (std::is_integral_v<T>)
+    {
+        std::cout << "Integral type\n";
+    }
+    else
+    {
+        std::cout << "Non-integral type\n";
+    }
+}
+
+int main()
+{
+    std::cout << "Demonstrating various features of C++:\n";
+
+    CContainer<CCircle> circleContainer;
+    circleContainer.Add(CCircle(3.0));
+    circleContainer.Add(CCircle(4.0));
+    circleContainer.Display();
+
+    CContainer<CSquare> squareContainer;
+    squareContainer.Add(CSquare(2.0));
+    squareContainer.Add(CSquare(5.0));
+    squareContainer.Display();
+
+    std::cout << "\nDemonstrating smart pointers:\n";
+    UseSmartPointers();
+
+    std::cout << "\nDemonstrating threads:\n";
+    UseThreads();
+
+    std::cout << "\nDemonstrating STL:\n";
+    UseSTL();
+
+    std::cout << "\nDemonstrating lambda functions:\n";
+    UseLambdas();
+
+    std::cout << "\nDemonstrating function objects:\n";
+    UseFunctors();
+
+    std::cout << "\nDemonstrating advanced template usage:\n";
+    CAdvancedContainer<int> intContainer;
+    intContainer.Add(1);
+    intContainer.Add(2);
+    intContainer.Display();
+
+    CAdvancedContainer<std::string> stringContainer;
+    stringContainer.Add("hello");
+    stringContainer.Add("world");
+    stringContainer.Display();
+
+    std::cout << "\nDemonstrating custom memory management:\n";
+    UseCustomAllocator();
+
+    std::cout << "\nDemonstrating futures and promises:\n";
+    UseFutures();
+
+    std::cout << "\nDemonstrating type traits and SFINAE:\n";
+    PrintType<int>();
+    PrintType<double>();
+
+    return 0;
+}
