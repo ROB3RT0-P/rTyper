@@ -4,23 +4,26 @@
 
 Copyright (c) Robert Parry - 2024
 
-This software is provided 'as-is', without any express or implied <br />
-warranty. In no event will the authors be held liable for any damages <br />
-arising from the use of this software. <br />
+    Educational Use License <br />
 
-Permission is granted to anyone to use this software for any purpose, <br />
-including commercial applications, and to alter it and redistribute it <br />
-freely, subject to the following restrictions: <br />
+    Copyright (c) [2024] [Robert Parry] <br />
 
-1. The origin of this software must not be misrepresented; you must not <br />
-claim that you wrote the original software. If you use this software <br />
-in a product, an acknowledgment in the product documentation would be <br />
-appreciated but is not required. <br />
+    Permission is hereby granted, free of charge, to any person obtaining a copy of <br />
+    this software and associated documentation files (the "Software"), to use the <br />
+    Software for educational purposes only, including without limitation the rights <br />
+    to view, study, and learn from the source code. <br />
 
-2. Altered source versions must be plainly marked as such, and must not be <br />
-misrepresented as being the original software. <br />
+    Any use, reproduction, copying, modification, distribution, sublicensing, or <br />
+    other exploitation of the Software, in whole or in part, is expressly prohibited <br />
+    without the express written permission of the copyright holder. <br />
+    
+    This notice may not be removed or altered from any source distribution. <br />
 
-3. This notice may not be removed or altered from any source <br />
-distribution. <br />
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, <br />
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A <br />
+    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE <br />
+    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, <br />
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE <br />
+    USE OR OTHER DEALINGS IN THE SOFTWARE. <br />
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
